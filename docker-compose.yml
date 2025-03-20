@@ -4,7 +4,7 @@ services:
   backend:
     build: ./backend               # Build the image using Dockerfile from ./backend directory
     ports:
-      - "5000:5000"                # Map container port 5000 to host port 5000
+      - "8080:8080"                # Map container port 5000 to host port 5000
     networks:
       - app-network               # Connect to custom bridge network
     healthcheck:
