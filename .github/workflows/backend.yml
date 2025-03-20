@@ -1,4 +1,9 @@
-name: Backend CI Pipeline
+# ----------------------------------------------------------
+# GitHub Actions Workflow: Backend Service CI
+# ----------------------------------------------------------
+
+# Workflow name displayed in GitHub Actions UI  
+name: Backend CI
 
 on:
   push:
@@ -7,18 +12,21 @@ on:
       - '.github/workflows/backend.yml' # Trigger when this workflow file changes
   pull_request:
     paths:
-      - 'backend/**'
-      - '.github/workflows/backend.yml'
-  workflow_dispatch:  
+      - 'backend/**'                    # Trigger when backend files are changed in a pull request
+      - '.github/workflows/backend.yml' # Trigger when this workflow file changes in a pull request
+  workflow_dispatch:                    # Allow manual trigger of the workflow
 
 jobs:
   backend:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest              # Use latest Ubuntu runner
 
     steps:
+      # ------------------- Checkout the Code -------------------
+      # Step to check out the code from the repository
       - name: Check out code
         uses: actions/checkout@v2
 
+      # ------------------- Setup Docker -------------------
       # Step to fix package conflicts and install Docker
       - name: Set up Docker
         run: |
@@ -49,47 +57,55 @@ jobs:
           docker --version
           docker-compose --version
 
+      # ------------------- Build and Start Backend Service -------------------
       # Build and start the backend service using Docker Compose
       - name: Build and start backend service with Docker Compose
         run: |
           docker-compose -f docker-compose.yml up -d --build backend
 
+      # ------------------- Wait for Backend Service -------------------
       # Wait for the backend service to be ready
       - name: Wait for backend to be ready
         run: |
           echo "Waiting for backend service to be ready..."
           sleep 30  # Adjust the sleep time based on expected startup time
 
+      # ------------------- Health Check -------------------
       # Check the backend service health
       - name: Check backend service health
         run: |
           echo "Testing backend service at http://localhost:8080"
           curl -f http://localhost:8080/health || echo "Backend service failed health check!"
 
+      # ------------------- Fetch Backend Service Logs -------------------
       # Fetch backend service logs
       - name: Get backend service logs
         run: |
           echo "Fetching backend service logs"
           docker-compose logs backend
 
+      # ------------------- Fetch MySQL DB Logs -------------------
       # Fetch MySQL DB logs
       - name: Get MySQL DB logs
         run: |
           echo "Fetching MySQL DB logs"
           docker-compose logs db
 
+      # ------------------- Check MySQL DB Accessibility -------------------
       # Check if MySQL DB is accessible
       - name: Check if MySQL service is accessible
         run: |
           echo "Checking if MySQL DB is accessible"
           docker-compose exec db mysqladmin ping -h localhost || echo "MySQL DB is not accessible!"
 
+      # ------------------- Run Backend Tests -------------------
       # Run backend tests (inside the backend container, without TTY)
       - name: Run backend tests
         run: |
           echo "Running backend tests inside backend container"
           docker-compose exec -T backend npm test  # Ensure tests run inside the backend container
 
+      # ------------------- Shut Down Docker Containers -------------------
       # Shut down the Docker containers after testing
       - name: Shut down the Docker containers
         run: |
