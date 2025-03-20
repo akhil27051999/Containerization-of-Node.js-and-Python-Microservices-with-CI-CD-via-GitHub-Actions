@@ -9,12 +9,13 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/users', (req, res) => {
-  db.query('SELECT * FROM users', (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json(results);
-  });
+  db.query('SELECT * FROM users')
+    .then(([results]) => {
+      res.json(results);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err.message });
+    });
 });
 
 // Ensure the app listens on all network interfaces (0.0.0.0)
