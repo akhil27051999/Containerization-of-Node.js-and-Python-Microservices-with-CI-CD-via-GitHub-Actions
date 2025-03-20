@@ -17,6 +17,7 @@ app.get('/users', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
+// Ensure the app listens on all network interfaces (0.0.0.0)
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Backend listening on port ${PORT}`);
 });
