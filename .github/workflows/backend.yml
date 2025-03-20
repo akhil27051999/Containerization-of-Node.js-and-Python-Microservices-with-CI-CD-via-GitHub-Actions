@@ -3,7 +3,7 @@
 # ----------------------------------------------------------
 
 # Workflow name displayed in GitHub Actions UI  
-name: Backend CI
+name: Backend Service CI
 
 on:
   push:
