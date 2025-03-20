@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"No tests specified\" && exit 0"  // Placeholder test script
+    "test": "echo \"No tests specified\" && exit 0" 
   },
   "dependencies": {
     "dotenv": "^16.0.3",
