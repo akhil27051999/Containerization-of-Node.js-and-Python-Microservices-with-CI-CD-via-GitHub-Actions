@@ -1,5 +1,5 @@
 # ----------------------------------------------------------
-# GitHub Actions Workflow: Docker Compose CI - Frontend Only
+# GitHub Actions Workflow: Docker Compose CI - Backend Only
 # ----------------------------------------------------------
 
 # Name of the workflow displayed in GitHub Actions UI
