@@ -9,6 +9,7 @@ on:
     paths:
       - 'auth/**'
       - '.github/workflows/auth.yml'
+  workflow_dispatch:
 
 jobs:
   auth-service-ci:
