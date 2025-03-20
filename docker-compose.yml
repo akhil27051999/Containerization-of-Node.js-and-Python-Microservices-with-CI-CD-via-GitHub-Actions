@@ -1,40 +1,32 @@
-# Docker Compose Configuration File
-version: '3.7'  # Define the Compose file version
+version: '3.7'
 
 services:
-  # Backend Service
   backend:
-    build: ./backend  # Build the Docker image from the Dockerfile in ./backend directory
+    build: ./backend
     ports:
-      - "8080:8080"  # Map host port 8080 to container port 8080
+      - "8080:8080"
     networks:
-      - app-network  # Attach backend to a custom bridge network called app-network
-
-    # Healthcheck configuration for backend service
+      - app-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]  # Command to test health endpoint
-      interval: 30s   # Run health check every 30 seconds
-      timeout: 10s    # Timeout if health check takes more than 10 seconds
-      retries: 3      # Retry 3 times before marking container as unhealthy
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # Frontend Service
   frontend:
-    build: ./frontend  # Build the Docker image from the Dockerfile in ./frontend directory
+    build: ./frontend
     ports:
-      - "3000:80"  # Map host port 3000 to container port 80 (used by Nginx)
+      - "3000:80"
     networks:
-      - app-network  # Attach frontend to the same custom bridge network
+      - app-network
     depends_on:
-      - backend  # Ensure backend container starts before frontend
-
-    # Healthcheck configuration for frontend service
+      - backend
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]  # Command to test frontend health
-      interval: 30s  # Run health check every 30 seconds
-      timeout: 10s   # Timeout if health check takes more than 10 seconds
-      retries: 3     # Retry 3 times before marking container as unhealthy
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-# Network Configuration
 networks:
   app-network:
-    driver: bridge  # Use the bridge driver to create a shared network
+    driver: bridge
