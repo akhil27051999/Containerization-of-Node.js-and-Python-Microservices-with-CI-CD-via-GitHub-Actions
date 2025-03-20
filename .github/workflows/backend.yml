@@ -1,8 +1,6 @@
 # Name of the GitHub Actions workflow
 name: Docker Compose CI - Backend Only
 
-# Trigger this workflow on push or pull request events on the 'main' branch,
-# and only when changes are made in the 'backend/' directory
 on:
   push:
     branches: [ main ]
@@ -16,46 +14,32 @@ on:
 
 jobs:
   build-and-run:
-    # Define the environment where this job will run
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the source code from the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Docker Buildx (optional but useful for advanced builds)
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Step 3: Build and run containers using Docker Compose
       - name: Docker Compose Up
         run: |
-          echo "Checking Docker Compose version"
-          docker compose version
-
-          echo "Building and starting services"
           docker compose up -d --build
 
-      # Step 4: Wait for services to become healthy
       - name: Wait for services to be healthy
         run: |
           echo "Waiting 30 seconds for services to initialize..."
           sleep 30
 
-      # Step 5: Test the backend service endpoint using curl
-      - name: Test backend service endpoint
+      - name: Test backend service
         run: |
-          echo "Testing backend at http://localhost:8080"
-          curl -f http://localhost:8080/health || (echo "Service test failed!" && exit 1)
+          echo "Testing backend service at http://localhost:8080"
+          curl -f http://localhost:8080 || (echo "Service test failed!" && exit 1)
 
-      # Step 6: Show running containers for debugging/logs
       - name: Check running containers
         run: docker ps -a
 
-      # Step 7: Clean up - stop and remove containers, volumes, and networks
       - name: Clean up
-        if: always()  # Ensures this step runs even if a previous one fails
-        run: |
-          echo "Cleaning up Docker containers and networks..."
-          docker compose down --volumes --remove-orphans
+        if: always()
+        run: docker compose down --volumes --remove-orphans
