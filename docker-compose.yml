@@ -8,11 +8,23 @@ services:
     networks:
       - app-network               # Connect to custom bridge network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]  # Health check hitting backend API
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]  # Health check hitting backend API
       interval: 30s
       timeout: 10s
       retries: 3
-
+  frontend:
+    build: ./frontend
+    ports:
+     - "3000:80"
+    networks:
+     - app-network
+    depends_on:
+     - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interva;: 30s
+      timout: 10s
+      retries: 3
 networks:
   app-network:
     driver: bridge                # Define custom bridge network
