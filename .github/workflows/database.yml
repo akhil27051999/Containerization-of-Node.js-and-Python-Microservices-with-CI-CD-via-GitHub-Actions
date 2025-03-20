@@ -1,0 +1,47 @@
+name: MySQL DB CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  db-test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpass
+          MYSQL_DATABASE: docker_demo
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -prootpass"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Wait for MySQL to be healthy
+        run: |
+          echo "Waiting for MySQL to be ready..."
+          for i in {1..30}; do
+            if mysqladmin ping -h 127.0.0.1 -u root -prootpass --silent; then
+              echo "MySQL is ready!"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Verify DB Connection & Run Init SQL
+        run: |
+          mysql -h 127.0.0.1 -u root -prootpass docker_demo < ./db/init.sql
+
+      - name: Run sample SQL query check
+        run: |
+          echo "SELECT DATABASE();" | mysql -h 127.0.0.1 -u root -prootpass docker_demo
