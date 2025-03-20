@@ -17,7 +17,7 @@ on:
       - '.github/workflows/frontend.yml'
   workflow_dispatch:                    # Allow manual workflow trigger
 
-# Define job(s) to run
+# ------------------- Define Jobs -------------------
 jobs:
   frontend-service-ci:
     runs-on: ubuntu-latest              # Use latest Ubuntu runner
