@@ -1,7 +1,6 @@
-# -----------------------------------------
-# GitHub Actions Workflow for CI Testing
-# Backend-focused CI using Docker Compose
-# -----------------------------------------
+# ----------------------------------------------------------
+# GitHub Actions Workflow: Docker Compose CI - Frontend Only
+# ----------------------------------------------------------
 
 # Name of the workflow displayed in GitHub Actions UI
 name: Docker Compose CI - Backend Only
