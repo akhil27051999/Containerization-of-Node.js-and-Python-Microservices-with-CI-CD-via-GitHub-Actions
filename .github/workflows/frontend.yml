@@ -5,7 +5,7 @@
 # Workflow name displayed in GitHub Actions UI
 name: Frontend Service CI
 
-# Trigger events
+# ------------------- Trigger Conditions -------------------
 on:
   push:
     paths:
