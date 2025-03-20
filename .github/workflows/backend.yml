@@ -5,6 +5,7 @@
 # Workflow name displayed in GitHub Actions UI  
 name: Backend Service CI
 
+# ------------------- Trigger Conditions -------------------
 on:
   push:
     paths:
@@ -16,6 +17,7 @@ on:
       - '.github/workflows/backend.yml' # Trigger when this workflow file changes in a pull request
   workflow_dispatch:                    # Allow manual trigger of the workflow
 
+# ------------------- Define Jobs ------------------- 
 jobs:
   backend:
     runs-on: ubuntu-latest              # Use latest Ubuntu runner
