@@ -1,5 +1,5 @@
 # ------------------- Name of the GitHub Actions Workflow -------------------
-name: Docker Compose CI - Backend Only
+name: Backend Service CI
 
 # ------------------- Trigger Conditions -------------------
 on:
