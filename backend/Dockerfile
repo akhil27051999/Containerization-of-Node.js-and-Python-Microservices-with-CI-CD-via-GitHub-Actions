@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Expose port 5000 so the container can be accessed from the host
-EXPOSE 5000
+EXPOSE 8080
 
 # Health check to verify if the application is running properly
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
