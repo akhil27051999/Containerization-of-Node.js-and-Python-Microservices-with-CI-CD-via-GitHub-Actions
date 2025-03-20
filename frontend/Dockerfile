@@ -1,33 +1,32 @@
-# Stage 1: Build the Frontend
-FROM node:18 as build
+# Stage 1: Build React App
+FROM node:18-alpine as build
 
-# Set working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
+# Copy package.json and lock file
 COPY package*.json ./
 
-# Install frontend dependencies
+# Install dependencies
 RUN npm install
 
-# Copy the rest of the frontend source code
+# Copy rest of the frontend code
 COPY . .
 
-# Build the production-ready React app
+# Build the React app
 RUN npm run build
 
-
-# Stage 2: Serve the frontend using Nginx
+# Stage 2: Serve React app with Nginx
 FROM nginx:alpine
 
-# Copy the build folder from the previous stage into Nginx's web directory
+# Remove default nginx static content
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy built app from previous stage
 COPY --from=build /app/build /usr/share/nginx/html
 
-# (Optional) Copy custom Nginx config file if you have one
-# COPY nginx.conf /etc/nginx/nginx.conf
-
-# Expose port 80 to allow traffic
+# Expose port 80
 EXPOSE 80
 
-# (Optional) Add a health check to ensure the container is healthy
-HEALTHCHECK CMD curl --fail http://localhost || exit 1
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
