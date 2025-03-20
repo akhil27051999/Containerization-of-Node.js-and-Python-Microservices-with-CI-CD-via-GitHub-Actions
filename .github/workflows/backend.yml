@@ -16,44 +16,58 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
+      # Step to install Docker and Docker Compose
       - name: Set up Docker
-        uses: docker/setup-buildx-action@v1
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker --version
+          docker-compose --version
 
+      # Build and start the backend service using Docker Compose
       - name: Build and start backend service with Docker Compose
         run: |
-          docker-compose -f docker-compose.yml up -d --build backend  # Only build and start the backend service
+          docker-compose -f docker-compose.yml up -d --build backend
 
+      # Wait for the backend service to be ready
       - name: Wait for backend to be ready
         run: |
           echo "Waiting for backend service to be ready..."
           sleep 30  # Adjust the sleep time based on expected startup time
 
+      # Check the backend service health
       - name: Check backend service health
         run: |
           echo "Testing backend service at http://localhost:8080"
-          curl -f http://localhost:8080/health || echo "Backend service failed health check!"  # Check health endpoint
+          curl -f http://localhost:8080/health || echo "Backend service failed health check!"
 
+      # Fetch backend service logs
       - name: Get backend service logs
         run: |
           echo "Fetching backend service logs"
-          docker-compose logs backend  # Get logs for backend service
+          docker-compose logs backend
 
-      - name: Check MySQL DB logs
+      # Fetch MySQL DB logs
+      - name: Get MySQL DB logs
         run: |
           echo "Fetching MySQL DB logs"
-          docker-compose logs db  # Get logs for MySQL service
+          docker-compose logs db
 
+      # Check if MySQL DB is accessible
       - name: Check if MySQL service is accessible
         run: |
           echo "Checking if MySQL DB is accessible"
-          docker-compose exec db mysqladmin ping -h localhost || echo "MySQL DB is not accessible!"  # MySQL ping check
+          docker-compose exec db mysqladmin ping -h localhost || echo "MySQL DB is not accessible!"
 
-      - name: Run backend tests (Optional)
+      # Run backend tests (Optional)
+      - name: Run backend tests
         run: |
           echo "Running backend tests"
-          # Add your backend testing commands here, e.g., unit tests or integration tests
           npm test
 
+      # Shut down the Docker containers after testing
       - name: Shut down the Docker containers
         run: |
-          docker-compose down  # Shut down all containers after testing
+          docker-compose down
