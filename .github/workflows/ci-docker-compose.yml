@@ -1,12 +1,17 @@
 # Name of the GitHub Actions workflow
-name: Docker Compose CI
+name: Docker Compose CI - Backend Only
 
-# Trigger this workflow on push or pull request events on the 'main' branch
+# Trigger this workflow only on push or pull request events on the 'main' branch,
+# and only if changes are made in the 'backend/' directory
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'backend/**'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'backend/**'
 
 jobs:
   build-and-run:
