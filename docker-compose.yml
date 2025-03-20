@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend               # Build the image using Dockerfile from ./backend directory
+    ports:
+      - "5000:5000"                # Map container port 5000 to host port 5000
+    networks:
+      - app-network               # Connect to custom bridge network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]  # Health check hitting backend API
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  app-network:
+    driver: bridge                # Define custom bridge network
