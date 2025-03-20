@@ -1,4 +1,8 @@
-# ------------------- Name of the GitHub Actions Workflow -------------------
+# ----------------------------------------------------------
+# GitHub Actions Workflow: Backend Service CI
+# ----------------------------------------------------------
+
+# Workflow name displayed in GitHub Actions UI
 name: Backend Service CI
 
 # ------------------- Trigger Conditions -------------------
