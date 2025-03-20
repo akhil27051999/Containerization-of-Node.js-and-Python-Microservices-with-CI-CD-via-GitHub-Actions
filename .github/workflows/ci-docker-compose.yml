@@ -1,0 +1,55 @@
+# Name of the GitHub Actions workflow
+name: Docker Compose CI
+
+# Trigger this workflow on push or pull request events on the 'main' branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-run:
+    # Define the environment where this job will run
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the source code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Docker Buildx (required for building Docker images)
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      # Step 3: Build and run containers using Docker Compose and in inside run 
+      
+      # Check Docker Compose version
+      # Build images and start services in detached mode
+      - name: Docker Compose Up
+        run: |
+          docker-compose version              
+          docker-compose up -d --build        
+
+      # Step 4: Wait for services to initialize (adjust time if your services take longer)
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting 15 seconds for services to initialize..."
+          sleep 15
+
+      # Step 5: Test the main service endpoint using curl
+      - name: Test service endpoint
+        run: |
+          echo "Testing service at http://localhost:8080"
+          # -f: Fail silently on HTTP errors (non-2xx codes)
+          # If it fails, exit the workflow with error
+          curl -f http://localhost:8080 || (echo "Service test failed!" && exit 1)
+
+      # Step 6: Display the list of running containers (for debugging/verification)
+      - name: Check running containers
+        run: docker ps -a
+
+      # Step 7: Clean up - stop and remove containers, networks, volumes, and images created
+      - name: Clean up
+        if: always()                         # Ensures cleanup runs even if previous steps fail
+        run: docker-compose down
