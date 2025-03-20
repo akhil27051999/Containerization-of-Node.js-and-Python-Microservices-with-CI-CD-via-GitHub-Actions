@@ -31,6 +31,19 @@ services:
       timeout: 10s      # Timeout if health check takes more than 10 seconds
       retries: 3        # Retry health check 3 times before marking the container as unhealthy
 
+  # ------------------- Auth Service -------------------
+  auth:
+    build: ./auth       # Build the auth image using the Dockerfile in the ./auth directory
+    ports:
+      - "6000:6000"     # Map container's port 6000 to host's port 6000
+    networks:
+      - app-network     # Connect the auth service to the same custom bridge network
+    healthcheck:        # Health check configuration for the auth service
+      test: ["CMD", "curl", "-f", "http://localhost:6000/health"]  # Check if /health endpoint is working
+      interval: 30s     # Run the health check every 30 seconds
+      timeout: 10s      # Timeout if health check takes more than 10 seconds
+      retries: 3        # Retry health check 3 times before marking the container as unhealthy
+
 # ------------------- Custom Docker Network -------------------
 networks:
   app-network:
