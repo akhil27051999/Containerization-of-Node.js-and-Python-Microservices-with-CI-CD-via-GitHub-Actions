@@ -1,30 +1,40 @@
-version: '3.7'
+# Docker Compose Configuration File
+version: '3.7'  # Define the Compose file version
 
 services:
+  # Backend Service
   backend:
-    build: ./backend               # Build the image using Dockerfile from ./backend directory
+    build: ./backend  # Build the Docker image from the Dockerfile in ./backend directory
     ports:
-      - "8080:8080"                # Map container port 5000 to host port 5000
+      - "8080:8080"  # Map host port 8080 to container port 8080
     networks:
-      - app-network               # Connect to custom bridge network
+      - app-network  # Attach backend to a custom bridge network called app-network
+
+    # Healthcheck configuration for backend service
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]  # Health check hitting backend API
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]  # Command to test health endpoint
+      interval: 30s   # Run health check every 30 seconds
+      timeout: 10s    # Timeout if health check takes more than 10 seconds
+      retries: 3      # Retry 3 times before marking container as unhealthy
+
+  # Frontend Service
   frontend:
-    build: ./frontend
+    build: ./frontend  # Build the Docker image from the Dockerfile in ./frontend directory
     ports:
-     - "3000:80"
+      - "3000:80"  # Map host port 3000 to container port 80 (used by Nginx)
     networks:
-     - app-network
+      - app-network  # Attach frontend to the same custom bridge network
     depends_on:
-     - backend
+      - backend  # Ensure backend container starts before frontend
+
+    # Healthcheck configuration for frontend service
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
-      interval;: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]  # Command to test frontend health
+      interval: 30s  # Run health check every 30 seconds
+      timeout: 10s   # Timeout if health check takes more than 10 seconds
+      retries: 3     # Retry 3 times before marking container as unhealthy
+
+# Network Configuration
 networks:
   app-network:
-    driver: bridge                # Define custom bridge network
+    driver: bridge  # Use the bridge driver to create a shared network
