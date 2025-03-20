@@ -1,11 +1,13 @@
 {
-  "name": "backend-service",
+  "name": "node-backend-mysql",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mysql2": "^3.5.2"
   }
 }
