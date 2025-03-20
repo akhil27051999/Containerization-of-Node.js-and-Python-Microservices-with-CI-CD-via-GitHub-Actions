@@ -1,62 +1,54 @@
-# ----------------------------------------------------------
-# GitHub Actions Workflow: Backend Service CI
-# ----------------------------------------------------------
+# ------------------- Name of the GitHub Actions Workflow -------------------
+name: Docker Compose CI - Backend Only
 
-# Workflow name shown in GitHub Actions UI
-name: Backend Service CI
-
-#  Trigger events
+# ------------------- Trigger Conditions -------------------
 on:
   push:
+    branches: [ main ]                 # Trigger workflow on push to 'main' branch
     paths:
-      - 'backend/**'                     # Trigger when backend files change
-      - '.github/workflows/backend.yml' # Trigger when this workflow file changes
+      - 'backend/**'                   # Trigger only if files inside 'backend' directory are modified
   pull_request:
+    branches: [ main ]                 # Trigger on pull requests targeting 'main' branch
     paths:
-      - 'backend/**'
-      - '.github/workflows/backend.yml'
-  workflow_dispatch:                    # Allow manual workflow trigger
+      - 'backend/**'                   # Trigger only if PR includes changes in 'backend' directory
+  workflow_dispatch:                   # Allow manual trigger from GitHub UI
 
-# Define job(s) to run
+# ------------------- Define Jobs -------------------
 jobs:
-  backend-service-ci:
-    runs-on: ubuntu-latest              # Use latest Ubuntu runner
-
-    services:
-      docker:
-        image: docker:24.0.6            # Use Docker service container
-        options: --privileged
+  build-and-run:
+    runs-on: ubuntu-latest             # Use the latest Ubuntu runner
 
     steps:
       # ------------------- Checkout the Code -------------------
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # ------------------- Set up Python (if applicable for backend tests) -------------------
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
+      # ------------------- Set up Docker Buildx -------------------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      # ------------------- Install Dependencies -------------------
-      - name: Install Python dependencies
+      # ------------------- Build and Start Services -------------------
+      - name: Docker Compose Up
         run: |
-          cd backend/app
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          docker compose up -d --build
 
-      # ------------------- Build Docker Image -------------------
-      - name: Build Backend Docker image
+      # ------------------- Wait for Services to Initialize -------------------
+      - name: Wait for services to be healthy
         run: |
-          docker build -t backend-service ./backend
+          echo "Waiting 30 seconds for services to initialize..."
+          sleep 30
 
-      # ------------------- Run Health Check Test -------------------
-      - name: Test Backend container health
+      # ------------------- Health Check Test -------------------
+      - name: Test backend service
         run: |
-          docker run -d --name backend-test -p 8080:8080 backend-service
-          sleep 5
-          curl --fail http://localhost:8080/health
+          echo "Testing backend service at http://localhost:8080"
+          curl -f http://localhost:8080 || (echo "Service test failed!" && exit 1)
+
+      # ------------------- Check Running Containers -------------------
+      - name: Check running containers
+        run: docker ps -a
 
       # ------------------- Cleanup -------------------
-      - name: Cleanup containers
-        run: docker rm -f backend-test || true
+      - name: Clean up
+        if: always()
+        run: docker compose down --volumes --remove-orphans
