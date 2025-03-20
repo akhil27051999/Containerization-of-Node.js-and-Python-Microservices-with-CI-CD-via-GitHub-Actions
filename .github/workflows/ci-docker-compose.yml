@@ -34,8 +34,8 @@ jobs:
       # Step 4: Wait for services to be healthy (adjust time if needed)
       - name: Wait for services to be healthy
         run: |
-          echo "Waiting 15 seconds for services to initialize..."
-          sleep 15
+          echo "Waiting 30 seconds for services to initialize..."
+          sleep 30
 
       # Step 5: Test the main service endpoint using curl
       - name: Test service endpoint
