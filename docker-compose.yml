@@ -1,32 +1,37 @@
-version: '3.7'
+version: '3.7'  # Specify the Docker Compose file format version
 
 services:
+  # ------------------- Backend Service -------------------
   backend:
-    build: ./backend
+    build: ./backend   # Build the backend image using the Dockerfile in the ./backend directory
     ports:
-      - "8080:8080"
+      - "8080:8080"     # Map container's port 8080 to host's port 8080
     networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - app-network     # Connect the backend service to a custom bridge network named 'app-network'
+    
+    healthcheck:        # Health check configuration to monitor backend service health
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]  # Check if /health endpoint is working
+      interval: 30s     # Run the health check every 30 seconds
+      timeout: 10s      # Timeout if health check takes more than 10 seconds
+      retries: 3        # Retry health check 3 times before marking the container as unhealthy
 
+  # ------------------- Frontend Service -------------------
   frontend:
-    build: ./frontend
+    build: ./frontend   # Build the frontend image using the Dockerfile in the ./frontend directory
     ports:
-      - "80:80"
+      - "80:80"         # Map container's port 80 to host's port 80
     networks:
-      - app-network
+      - app-network     # Connect the frontend service to the same network as backend
     depends_on:
-      - backend
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - backend         # Ensure backend service starts before starting frontend (not a hard dependency on health, just order)
 
+    healthcheck:        # Health check configuration for the frontend service
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]   # Check if /health endpoint is working
+      interval: 30s     # Run the health check every 30 seconds
+      timeout: 10s      # Timeout if health check takes more than 10 seconds
+      retries: 3        # Retry health check 3 times before marking the container as unhealthy
+
+# ------------------- Custom Docker Network -------------------
 networks:
   app-network:
-    driver: bridge
+    driver: bridge      # Use the default bridge driver for container networking
