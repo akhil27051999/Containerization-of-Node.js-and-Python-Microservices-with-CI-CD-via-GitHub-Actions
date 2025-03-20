@@ -1,5 +1,12 @@
+# ----------------------------------------------------------
+# GitHub Actions Workflow: Auth Service CI
+# ----------------------------------------------------------
+
+# Workflow name displayed in GitHub Actions UI
+
 name: Auth Service CI
 
+# ------------------- Trigger Conditions -------------------
 on:
   push:
     paths:
@@ -11,6 +18,7 @@ on:
       - '.github/workflows/auth.yml'
   workflow_dispatch:
 
+# ------------------- Define Jobs ------------------- 
 jobs:
   auth-service-ci:
     runs-on: ubuntu-latest
