@@ -81,11 +81,11 @@ jobs:
           echo "Checking if MySQL DB is accessible"
           docker-compose exec db mysqladmin ping -h localhost || echo "MySQL DB is not accessible!"
 
-      # Run backend tests (inside the backend container)
+      # Run backend tests (inside the backend container, without TTY)
       - name: Run backend tests
         run: |
           echo "Running backend tests inside backend container"
-          docker-compose exec backend npm test  # Ensure tests run inside the backend container
+          docker-compose exec -T backend npm test  # Ensure tests run inside the backend container
 
       # Shut down the Docker containers after testing
       - name: Shut down the Docker containers
