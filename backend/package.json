@@ -1,22 +1,11 @@
 {
-  // Name of your project
-  "name": "backend",
-
-  // Version of your project
+  "name": "backend-service",
   "version": "1.0.0",
-
-  // Entry point of your application (the main file to run)
   "main": "index.js",
-
-  // Scripts to automate tasks like starting the server
   "scripts": {
-    // Run this script using: npm start
     "start": "node index.js"
   },
-
-  // Project dependencies (packages needed to run your app)
   "dependencies": {
-    // Express is a minimal web framework for Node.js
     "express": "^4.18.2"
   }
 }
