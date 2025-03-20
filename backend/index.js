@@ -5,7 +5,7 @@ const express = require('express');
 const app = express();
 
 // Defining the port number where the server will listen
-const PORT = 5000;
+const PORT = 8080;
 
 // Route to handle GET request to the root URL ("/")
 // It sends a simple response message when accessed
