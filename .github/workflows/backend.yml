@@ -2,12 +2,14 @@ name: Backend CI Pipeline
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - 'backend/**'                    # Trigger when backend files change
+      - '.github/workflows/backend.yml' # Trigger when this workflow file changes
   pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+  workflow_dispatch:  
 
 jobs:
   backend:
