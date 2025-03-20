@@ -1,59 +1,49 @@
 # ----------------------------------------------------------
-# GitHub Actions Workflow: Docker Compose CI - Frontend Only
+# GitHub Actions Workflow: Frontend Service CI
 # ----------------------------------------------------------
 
-# Name of the workflow displayed in the GitHub Actions UI
-name: Docker Compose CI - Frontend Only
+# Workflow name displayed in GitHub Actions UI
+name: Frontend Service CI
 
-# Define events that will trigger this workflow
+# Trigger events
 on:
   push:
-    branches: [ main ]               # Trigger workflow on push to the main branch
     paths:
-      - 'frontend/**'               # Trigger only if files inside 'frontend' directory are modified
+      - 'frontend/**'                    # Trigger when frontend files change
+      - '.github/workflows/frontend.yml' # Trigger when this workflow file changes
   pull_request:
-    branches: [ main ]               # Trigger on pull requests targeting main branch
     paths:
-      - 'frontend/**'               # Trigger only if PR includes changes in 'frontend' directory
-  workflow_dispatch:                # Allow manual trigger from GitHub UI
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
+  workflow_dispatch:                    # Allow manual workflow trigger
 
-# Define jobs to be executed
+# Define job(s) to run
 jobs:
-  build-and-run:
-    runs-on: ubuntu-latest          # Use the latest Ubuntu runner provided by GitHub
+  frontend-service-ci:
+    runs-on: ubuntu-latest              # Use latest Ubuntu runner
+
+    services:
+      docker:
+        image: docker:24.0.6            # Use Docker service container
+        options: --privileged
 
     steps:
-      # Step 1: Checkout the repository code
-      - name: Checkout code
+      # ------------------- Checkout the Code -------------------
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Docker Buildx (Advanced Docker build capabilities)
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # Step 3: Build and start services defined in docker-compose.yml
-      - name: Docker Compose Up
+      # ------------------- Build Docker Image -------------------
+      - name: Build Frontend Docker image
         run: |
-          docker compose up -d --build  # -d runs in detached mode, --build ensures fresh image build
+          docker build -t frontend-service ./frontend
 
-      # Step 4: Wait for services to fully start up
-      - name: Wait for services to be healthy
+      # ------------------- Run Health Check Test -------------------
+      - name: Test Frontend container health
         run: |
-          echo "Waiting 30 seconds for services to initialize..."
-          sleep 30                      # Delay to give containers time to initialize properly
+          docker run -d --name frontend-test -p 80:80 frontend-service
+          sleep 5
+          curl --fail http://localhost:80
 
-      # Step 5: Health check by hitting frontend service endpoint
-      - name: Test frontend service
-        run: |
-          echo "Testing frontend service at http://localhost:80"
-          curl -f http://localhost:80 || (echo "Service test failed!" && exit 1)
-
-      # Step 6: Show status of running containers (helpful for debugging)
-      - name: Check running containers
-        run: docker ps -a
-
-      # Step 7: Clean up containers, volumes, and orphaned services
-      - name: Clean up
-        if: always()                    # Always run cleanup even if earlier steps fail
-        run: |
-          docker compose down --volumes --remove-orphans
+      # ------------------- Cleanup -------------------
+      - name: Cleanup containers
+        run: docker rm -f frontend-test || true
