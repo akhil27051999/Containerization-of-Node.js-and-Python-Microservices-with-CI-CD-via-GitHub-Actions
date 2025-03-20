@@ -2,10 +2,10 @@
 # GitHub Actions Workflow: Backend Service CI
 # ----------------------------------------------------------
 
-# 👇 Workflow name shown in GitHub Actions UI
+# Workflow name shown in GitHub Actions UI
 name: Backend Service CI
 
-# 👇 Trigger events
+#  Trigger events
 on:
   push:
     paths:
@@ -17,7 +17,7 @@ on:
       - '.github/workflows/backend.yml'
   workflow_dispatch:                    # Allow manual workflow trigger
 
-# 👇 Define job(s) to run
+# Define job(s) to run
 jobs:
   backend-service-ci:
     runs-on: ubuntu-latest              # Use latest Ubuntu runner
