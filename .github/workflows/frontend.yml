@@ -1,7 +1,7 @@
 # Name of the GitHub Actions workflow
 name: Docker Compose CI - Frontend Only
 
-# Trigger workflow on push or PR to 'main' branch, only when changes happen in the 'frontend/' directory
+# Trigger workflow only on frontend changes
 on:
   push:
     branches: [ main ]
@@ -11,59 +11,36 @@ on:
     branches: [ main ]
     paths:
       - 'frontend/**'
-  workflow_dispatch:  # Allows manual triggering from GitHub UI
+  workflow_dispatch:
 
 jobs:
   build-and-run:
-    runs-on: ubuntu-latest  # Define the runner environment
+    runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Docker Buildx (advanced build capabilities)
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Step 3: Show Docker & Compose versions
-      - name: Show Docker and Compose Version
-        run: |
-          echo "Docker Version:"
-          docker --version
-          echo "Docker Compose Version:"
-          docker compose version
-
-      # Step 4: Build and start containers using Docker Compose
       - name: Docker Compose Up
         run: |
-          echo "Building and starting containers..."
           docker compose up -d --build
 
-      # Step 5: Wait for containers to become healthy
       - name: Wait for services to be healthy
         run: |
-          echo "Waiting for services to initialize..."
+          echo "Waiting 30 seconds for services to initialize..."
           sleep 30
 
-      # Step 6: Test frontend endpoint using curl with retries
-      - name: Test frontend service endpoint
+      - name: Test frontend service
         run: |
-          echo "Testing frontend endpoint at http://localhost:3000"
-          for i in {1..5}; do
-            curl -f http://localhost:3000 && break || {
-              echo "Retry $i: Service not ready yet, waiting..."
-              sleep 5
-            }
-          done || (echo "Frontend service test failed!" && exit 1)
+          echo "Testing frontend service at http://localhost:80"
+          curl -f http://localhost:80 || (echo "Service test failed!" && exit 1)
 
-      # Step 7: Show running containers (helpful for debugging)
-      - name: Show running containers
+      - name: Check running containers
         run: docker ps -a
 
-      # Step 8: Cleanup - stop containers and remove networks/volumes
-      - name: Docker Compose Down (Cleanup)
-        if: always()  # Run this step even if previous steps fail
-        run: |
-          echo "Cleaning up containers and networks..."
-          docker compose down --volumes --remove-orphans
+      - name: Clean up
+        if: always()
+        run: docker compose down --volumes --remove-orphans
