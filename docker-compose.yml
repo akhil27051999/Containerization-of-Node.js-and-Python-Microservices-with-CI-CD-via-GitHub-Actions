@@ -8,7 +8,13 @@ services:
       - "8080:8080"     # Map container's port 8080 to host's port 8080
     networks:
       - app-network     # Connect the backend service to a custom bridge network named 'app-network'
-    
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=rootpass
+      - DB_NAME=docker_demo
+    depends_on:
+      - db              # Ensure database service is started before backend
     healthcheck:        # Health check configuration to monitor backend service health
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]  # Check if /health endpoint is working
       interval: 30s     # Run the health check every 30 seconds
@@ -24,7 +30,6 @@ services:
       - app-network     # Connect the frontend service to the same network as backend
     depends_on:
       - backend         # Ensure backend service starts before starting frontend (not a hard dependency on health, just order)
-
     healthcheck:        # Health check configuration for the frontend service
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]   # Check if /health endpoint is working
       interval: 30s     # Run the health check every 30 seconds
@@ -44,7 +49,30 @@ services:
       timeout: 10s      # Timeout if health check takes more than 10 seconds
       retries: 3        # Retry health check 3 times before marking the container as unhealthy
 
+  # ------------------- MySQL Database Service -------------------
+  db:
+    image: mysql:8.0    # Use official MySQL 8.0 image
+    ports:
+      - "3306:3306"     # Map MySQL port to host
+    networks:
+      - app-network     # Connect DB service to the same network
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=docker_demo
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
 # ------------------- Custom Docker Network -------------------
 networks:
   app-network:
     driver: bridge      # Use the default bridge driver for container networking
+
+# ------------------- Persistent Volume -------------------
+volumes:
+  dbdata:
