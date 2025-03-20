@@ -1,50 +1,44 @@
-# ----------------------------------------------------------
-# GitHub Actions Workflow: MySQL DB CI
-# ----------------------------------------------------------
-
-# Workflow name displayed in GitHub Actions UI
 name: MySQL DB CI
 
-# ------------------- Trigger Conditions -------------------
 on:
   push:
-    branches: [ main ]         # Trigger when code is pushed to the main branch
+    branches: [ main ]         # Trigger the workflow when code is pushed to the main branch
   pull_request:
-    branches: [ main ]         # Trigger when a pull request targets the main branch
-  workflow_dispatch:           # Allow manual trigger of the workflow
+    branches: [ main ]         # Trigger the workflow when a pull request is made to the main branch
+  workflow_dispatch:           # Allows the workflow to be manually triggered
 
-# ------------------- Define Jobs ------------------- 
 jobs:
   db-test:
-    runs-on: ubuntu-latest     # Use latest Ubuntu runner
+    runs-on: ubuntu-latest     # Run the job on the latest Ubuntu environment
     services:
       mysql:
-        image: mysql:8.0       # Use MySQL 8.0 Docker image
+        image: mysql:8.0       # Use the MySQL 8.0 Docker image for the database service
         env:
-          MYSQL_ROOT_PASSWORD: rootpass   # Set root password for MySQL
-          MYSQL_DATABASE: docker_demo     # Set the initial database
+          MYSQL_ROOT_PASSWORD: rootpass   # Set the root password for MySQL
+          MYSQL_DATABASE: docker_demo     # Set the name of the database to create upon initialization
         ports:
-          - 3306:3306           # Expose MySQL port 3306 for use
+          - 3306:3306           # Expose MySQL port 3306 for use by other services in the workflow
         options: >-
-          # Set MySQL health check options
+          # Health check for MySQL container to ensure it is ready to accept connections
           --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -prootpass"
-          --health-interval=10s   # Check every 10 seconds
-          --health-timeout=5s     # Timeout after 5 seconds if no response
-          --health-retries=5      # Retry health check 5 times before failing
+          --health-interval=10s   # Perform health checks every 10 seconds
+          --health-timeout=5s     # Timeout health check if no response is received within 5 seconds
+          --health-retries=5      # Retry health check up to 5 times before marking the container as unhealthy
 
     steps:
       # ------------------- Checkout Repository -------------------
       - name: Checkout repository
-        uses: actions/checkout@v3  # Check out the repository's code
+        uses: actions/checkout@v3  # Check out the code from the repository to the runner
 
       # ------------------- Wait for MySQL to Be Healthy -------------------
       - name: Wait for MySQL to be healthy
         run: |
           echo "Waiting for MySQL to be ready..."
+          # Wait for MySQL to be ready for connection, retry up to 30 times
           for i in {1..30}; do
-            # Check if MySQL is ready by using mysqladmin ping
+            # Ping the MySQL server to check if it is ready
             if mysqladmin ping -h 127.0.0.1 -u root -prootpass --silent; then
-              echo "MySQL is ready!"
+              echo "MySQL is ready!"  # If MySQL is ready, break the loop
               break
             fi
             sleep 2   # Wait for 2 seconds before checking again
@@ -53,11 +47,11 @@ jobs:
       # ------------------- Verify DB Connection & Run Init SQL -------------------
       - name: Verify DB Connection & Run Init SQL
         run: |
-          # Execute the init.sql script to set up the initial database
+          # Run the init.sql script to set up the initial database schema and data
           mysql -h 127.0.0.1 -u root -prootpass docker_demo < ./db/init.sql
 
       # ------------------- Run Sample SQL Query Check -------------------
       - name: Run sample SQL query check
         run: |
-          # Run a simple query to verify the database connection
+          # Run a simple query to check the database connection
           echo "SELECT DATABASE();" | mysql -h 127.0.0.1 -u root -prootpass docker_demo
