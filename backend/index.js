@@ -2,7 +2,7 @@ const express = require('express');
 const db = require('./app/db');
 const app = express();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080; // Ensure this matches the exposed port in the Dockerfile
 
 app.get('/health', (req, res) => {
   res.send('Backend is healthy and connected to DB!');
