@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Install Docker Compose
@@ -21,7 +21,7 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose version
 
-      - name: Set up Docker Compose Stack
+      - name: Build and Run Docker Stack
         run: docker-compose up -d --build
 
       - name: Wait for Services to Initialize
@@ -34,9 +34,13 @@ jobs:
         run: |
           curl --fail http://localhost:5000/health
 
-      - name: Verify phpMyAdmin Port Availability
+      - name: Check phpMyAdmin Availability
         run: |
           curl --fail http://localhost:8080 || echo "phpMyAdmin might take extra time to load..."
 
       - name: Check Docker Networks
         run: docker network ls
+
+      - name: Cleanup Containers
+        if: always()
+        run: docker-compose down
