@@ -68,6 +68,21 @@ services:
       timeout: 10s
       retries: 5
 
+  # .................... phpmyadmin service -----------------------    
+  phpmyadmin:   # The phpmyadmin service provides a graphical web interface to interact with your MySQL database inside Docker. 
+    image: phpmyadmin/phpmyadmin   # It's especially helpful for developers who prefer a GUI over writing SQL queries in the terminal
+    restart: always
+    ports:
+      - "8080:80"       # phpMyAdmin uses a different host port to avoid conflict
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - MYSQL_ROOT_PASSWORD=rootpass
+    depends_on:
+      - db
+    networks:
+      - app-network
+
 # ------------------- Custom Docker Network -------------------
 networks:
   app-network:
