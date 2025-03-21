@@ -31,3 +31,8 @@ jobs:
       - name: Verify phpMyAdmin Port Availability
         run: |
           curl --fail http://localhost:8080 || echo "phpMyAdmin might take extra time to load..."
+          
+      - name: Check network list
+        run: |
+          docker network ls
+          
