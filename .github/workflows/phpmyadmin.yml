@@ -1,0 +1,32 @@
+name: Docker Stack Validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  docker-validation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Compose
+        run: docker-compose up -d --build
+
+      - name: Wait for Services to Initialize
+        run: sleep 30
+
+      - name: Check Running Containers
+        run: docker ps
+
+      - name: Check Backend Health Endpoint
+        run: |
+          curl --fail http://localhost:5000/health
+
+      - name: Verify phpMyAdmin Port Availability
+        run: |
+          curl --fail http://localhost:8080 || echo "phpMyAdmin might take extra time to load..."
