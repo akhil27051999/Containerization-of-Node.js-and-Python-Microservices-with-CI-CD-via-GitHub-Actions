@@ -20,6 +20,11 @@ services:
       interval: 30s     # Run the health check every 30 seconds
       timeout: 10s      # Timeout if health check takes more than 10 seconds
       retries: 3        # Retry health check 3 times before marking the container as unhealthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   # ------------------- Frontend Service -------------------
   frontend:
@@ -35,6 +40,11 @@ services:
       interval: 30s     # Run the health check every 30 seconds
       timeout: 10s      # Timeout if health check takes more than 10 seconds
       retries: 3        # Retry health check 3 times before marking the container as unhealthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   # ------------------- Auth Service -------------------
   auth:
@@ -48,7 +58,11 @@ services:
       interval: 30s     # Run the health check every 30 seconds
       timeout: 10s      # Timeout if health check takes more than 10 seconds
       retries: 3        # Retry health check 3 times before marking the container as unhealthy
-
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
   # ------------------- MySQL Database Service -------------------
   db:
     image: mysql:8.0    # Use official MySQL 8.0 image
@@ -67,7 +81,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
   # .................... phpmyadmin service -----------------------    
   phpmyadmin:   # The phpmyadmin service provides a graphical web interface to interact with your MySQL database inside Docker. 
     image: phpmyadmin/phpmyadmin   # It's especially helpful for developers who prefer a GUI over writing SQL queries in the terminal
@@ -87,7 +105,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 # ------------------- Custom Docker Network -------------------
 networks:
   app-network:
