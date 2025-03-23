@@ -1,0 +1,32 @@
+name: Docker Environment Inspection
+
+on:
+  workflow_dispatch:  # Manual trigger from GitHub UI
+  
+jobs:
+  inspect-docker-environment:
+    runs-on: ubuntu-latest
+  
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+
+      - name: Start Docker Compose Stack
+        run: docker-compose up -d --build
+
+      - name: List Docker Networks
+        run: docker network ls
+
+      - name: List Docker Volumes
+        run: docker volume ls
+
+      - name: List Docker Containers
+        run: docker ps -a
+
+      - name: Clean up Docker Stack
+        run: docker-compose down
