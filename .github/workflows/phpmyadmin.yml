@@ -1,4 +1,4 @@
-name: Docker Compose CI
+name: phpmyadmin CI
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
 
       - name: Check phpMyAdmin Availability
         run: |
-          curl --fail http://localhost:8080 || echo "phpMyAdmin might take extra time to load..."
+          curl --fail http://localhost:8081 || echo "phpMyAdmin might take extra time to load..."
 
       - name: Check Docker Networks
         run: docker network ls
