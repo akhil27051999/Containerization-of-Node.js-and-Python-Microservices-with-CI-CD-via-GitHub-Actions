@@ -1,5 +1,4 @@
-# .github/workflows/docker-build.yml
-name: Build & Test
+name: logs
 
 on:
   push:
@@ -40,7 +39,7 @@ jobs:
         docker-compose logs phpmyadmin > docker-logs/phpmyadmin.log
 
     - name: Upload Logs as Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: container-logs
         path: docker-logs/
