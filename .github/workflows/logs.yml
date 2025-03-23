@@ -1,0 +1,46 @@
+# .github/workflows/docker-build.yml
+name: Build & Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Compose
+      run: |
+        docker-compose up -d
+
+    - name: Wait for containers to be healthy
+      run: |
+        docker-compose ps
+        sleep 30
+
+    - name: Run Tests (Optional)
+      run: |
+        docker-compose exec backend curl http://localhost:8080/health || true
+        docker-compose exec frontend curl http://localhost:80/health || true
+
+    - name: Collect Docker Logs
+      run: |
+        mkdir -p docker-logs
+        docker-compose logs backend > docker-logs/backend.log
+        docker-compose logs frontend > docker-logs/frontend.log
+        docker-compose logs auth > docker-logs/auth.log
+        docker-compose logs db > docker-logs/db.log
+        docker-compose logs phpmyadmin > docker-logs/phpmyadmin.log
+
+    - name: Upload Logs as Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: container-logs
+        path: docker-logs/
