@@ -1,22 +1,39 @@
-# Use official Node.js 18 image as the base
-FROM node:18
+# ====================
+# Stage 1: Build Stage
+# ====================
+FROM node:18 as builder
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy only the package.json and package-lock.json first (for better caching)
+# Copy package files
 COPY package*.json ./
 
-# Install the dependencies inside the container
+# Install all dependencies (including dev dependencies)
 RUN npm install
 
-# Copy the rest of the application files (source code)
+# Copy rest of the source code
 COPY . .
 
-# Set environment variable for PORT (default to 8080)
-ENV PORT 8080
+# ===========================
+# Stage 2: Production Stage
+# ===========================
+FROM node:18-slim
 
-# Expose port 8080, which the app will listen on
+# Set working directory
+WORKDIR /app
+
+# Copy only package files and install **only production dependencies**
+COPY package*.json ./
+RUN npm install --omit=dev
+
+# Copy built app files from builder stage
+COPY --from=builder /app .
+
+# Set environment variable for PORT
+ENV PORT=8080
+
+# Expose the application port
 EXPOSE 8080
 
 # Start the Node.js application
