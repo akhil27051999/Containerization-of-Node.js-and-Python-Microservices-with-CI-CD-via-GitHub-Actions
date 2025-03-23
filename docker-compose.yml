@@ -73,7 +73,7 @@ services:
     image: phpmyadmin/phpmyadmin   # It's especially helpful for developers who prefer a GUI over writing SQL queries in the terminal
     restart: always
     ports:
-      - "8080:80"       # phpMyAdmin uses a different host port to avoid conflict
+      - "8081:80"       # phpMyAdmin uses a different host port to avoid conflict
     environment:
       - PMA_HOST=db
       - PMA_PORT=3306
