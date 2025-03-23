@@ -1,4 +1,4 @@
-name: logs
+name: Compose Logs Collection
 
 on:
   push:
@@ -8,38 +8,48 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  collect-logs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Set up Docker Compose
-      run: |
-        docker-compose up -d
+      - name: Verify Docker and Docker Compose Versions
+        run: |
+          docker --version
+          docker compose version
 
-    - name: Wait for containers to be healthy
-      run: |
-        docker-compose ps
-        sleep 30
+      - name: Start Docker Compose Services
+        run: docker compose up -d --build
 
-    - name: Run Tests (Optional)
-      run: |
-        docker-compose exec backend curl http://localhost:8080/health || true
-        docker-compose exec frontend curl http://localhost:80/health || true
+      - name: Wait for Services to Initialize
+        run: |
+          docker compose ps
+          sleep 30
 
-    - name: Collect Docker Logs
-      run: |
-        mkdir -p docker-logs
-        docker-compose logs backend > docker-logs/backend.log
-        docker-compose logs frontend > docker-logs/frontend.log
-        docker-compose logs auth > docker-logs/auth.log
-        docker-compose logs db > docker-logs/db.log
-        docker-compose logs phpmyadmin > docker-logs/phpmyadmin.log
+      - name: Run Health Checks
+        run: |
+          docker compose exec backend curl -f http://localhost:8080/health || echo "Backend health check failed"
+          docker compose exec frontend curl -f http://localhost:80/health || echo "Frontend health check failed"
+          docker compose exec auth curl -f http://localhost:6000/health || echo "Auth health check failed"
+          curl -f http://localhost:8081 || echo "phpMyAdmin health check might take time"
 
-    - name: Upload Logs as Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: container-logs
-        path: docker-logs/
+      - name: Collect Logs from Containers
+        run: |
+          mkdir -p docker-logs
+          docker compose logs backend > docker-logs/backend.log
+          docker compose logs frontend > docker-logs/frontend.log
+          docker compose logs auth > docker-logs/auth.log
+          docker compose logs db > docker-logs/db.log
+          docker compose logs phpmyadmin > docker-logs/phpmyadmin.log
+
+      - name: Upload Logs as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-logs
+          path: docker-logs/
+
+      - name: Clean Up Containers
+        if: always()
+        run: docker compose down --volumes --remove-orphans
