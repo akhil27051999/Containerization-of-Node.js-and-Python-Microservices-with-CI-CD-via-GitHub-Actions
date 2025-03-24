@@ -1,52 +1,49 @@
-name: Docker Stack CI
+name: Docker Stack Local Test
 
 on:
   push:
-    branches: [main]
+    paths:
+      - '**/*.yml'
+      - '**/Dockerfile'
+      - '**/*.js'
+      - '**/*.py'
+      - '**/*.sql'
+      - '**/package.json'
+      - '**/requirements.txt'
   pull_request:
-    branches: [main]
 
 jobs:
   docker-stack-test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set Up Docker Buildx
+      - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
-      - name: Enable Docker Swarm
-        run: docker swarm init
-
-      - name: Build Backend Image
-        run: docker build -t my-backend:latest ./backend
-
-      - name: Build Frontend Image
-        run: docker build -t my-frontend:latest ./frontend
-
-      - name: Deploy Docker Stack
+      - name: Initialize Docker Swarm
+        run: |
+          docker swarm init
+      - name: Create overlay network
+        run: |
+          docker network create --driver overlay --attachable app-network || true
+      - name: Build and Deploy Docker Stack
         run: |
           docker stack deploy -c docker-stack.yml mystack
           echo "Waiting 30 seconds for services to stabilize..."
           sleep 30
           docker service ls
           docker stack ps mystack
-
-      - name: Check Backend Container Health (Reliable Way)
+      - name: Healthcheck Status
         run: |
-          CONTAINER_ID=$(docker ps --filter "name=mystack_backend." --format "{{.ID}}" | head -n 1)
-          if [ -z "$CONTAINER_ID" ]; then
-            echo "Backend container not found!"
-            echo "Available containers:"
-            docker ps -a
-            exit 1
-          fi
-          echo "Backend container ID: $CONTAINER_ID"
-          docker inspect "$CONTAINER_ID"
-          HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' "$CONTAINER_ID" 2>/dev/null || echo "no-healthcheck")
-          echo "Backend container health status: $HEALTH_STATUS"
-
-
-
-
+          docker service ls
+          echo "Checking running containers:"
+          docker ps -a
+      - name: Tear Down Stack
+        if: always()
+        run: |
+          docker stack rm mystack
+          sleep 10
+          docker swarm leave --force
