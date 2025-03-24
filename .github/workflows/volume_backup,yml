@@ -1,0 +1,60 @@
+name: Docker Volume Backup
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'  # Daily at 1 AM UTC
+
+jobs:
+  backup-volume:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create Backup Directory
+        run: mkdir -p ./backup
+
+      - name: Create Docker Volume (if not exists)
+        run: docker volume create mysql_data || true
+
+      - name: Start MySQL Container
+        run: |
+          docker run -d \
+            --name mysql-container \
+            -e MYSQL_ROOT_PASSWORD=rootpass \
+            -e MYSQL_DATABASE=testdb \
+            -v mysql_data:/var/lib/mysql \
+            mysql:8.0
+
+      - name: Wait for MySQL to Initialize
+        run: sleep 30
+
+      - name: Add Dummy Data (optional for testing)
+        run: |
+          docker exec mysql-container mysql -uroot -prootpass -e "
+          USE testdb;
+          CREATE TABLE IF NOT EXISTS test (id INT, message VARCHAR(50));
+          INSERT INTO test VALUES (1, 'Backup successful');
+          "
+
+      - name: Backup Volume Data
+        run: |
+          docker run --rm \
+            -v mysql_data:/volume \
+            -v ${{ github.workspace }}/backup:/backup \
+            alpine \
+            tar czvf /backup/mysql_backup_$(date +%F).tar.gz -C /volume .
+
+      - name: Upload Backup Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mysql-volume-backup
+          path: ./backup/mysql_backup_*.tar.gz
+
+      - name: Cleanup Containers
+        run: docker rm -f mysql-container
