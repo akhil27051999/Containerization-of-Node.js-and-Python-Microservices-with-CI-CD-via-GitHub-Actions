@@ -1,37 +1,31 @@
-name: Docker Stack Local Test
+name: Docker Stack CI
 
 on:
   push:
-    paths:
-      - '**/*.yml'
-      - '**/Dockerfile'
-      - '**/*.js'
-      - '**/*.py'
-      - '**/*.sql'
-      - '**/package.json'
-      - '**/requirements.txt'
+    branches: [main]
   pull_request:
+    branches: [main]
 
 jobs:
   docker-stack-test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Docker
+      - name: Set Up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Initialize Docker Swarm
-        run: |
-          docker swarm init
+      - name: Enable Docker Swarm
+        run: docker swarm init
 
-      - name: Create overlay network
-        run: |
-          docker network create --driver overlay --attachable app-network || true
+      - name: Build Backend Image
+        run: docker build -t my-backend:latest ./backend
 
-      - name: Build and Deploy Docker Stack
+      - name: Build Frontend Image
+        run: docker build -t my-frontend:latest ./frontend
+
+      - name: Deploy Docker Stack
         run: |
           docker stack deploy -c docker-stack.yml mystack
           echo "Waiting 30 seconds for services to stabilize..."
@@ -39,15 +33,7 @@ jobs:
           docker service ls
           docker stack ps mystack
 
-      - name: Healthcheck Status
+      - name: Check Backend Service Health
         run: |
-          docker service ls
-          echo "Checking running containers:"
-          docker ps -a
-
-      - name: Tear Down Stack
-        if: always()
-        run: |
-          docker stack rm mystack
-          sleep 10
-          docker swarm leave --force
+          BACKEND_HEALTH=$(docker inspect --format='{{json .State.Health.Status}}' $(docker ps --filter name=mystack_backend --format "{{.ID}}" | head -n 1))
+          echo "Backend health status: $BACKEND_HEALTH"
