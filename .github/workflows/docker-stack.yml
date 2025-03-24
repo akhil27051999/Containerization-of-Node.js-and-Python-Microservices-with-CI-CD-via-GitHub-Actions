@@ -44,7 +44,7 @@ jobs:
           fi
           echo "Backend container ID: $CONTAINER_ID"
           docker inspect "$CONTAINER_ID"
-          HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' "$CONTAINER_ID" || echo "no-healthcheck")
+          HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' "$CONTAINER_ID" 2>/dev/null || echo "no-healthcheck")
           echo "Backend container health status: $HEALTH_STATUS"
 
 
