@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=rootpass
+      - DB_NAME=docker_demo
+    depends_on:
+      - db
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == worker]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  auth:
+    build:
+      context: ./auth
+    ports:
+      - "6000:6000"
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=docker_demo
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - MYSQL_ROOT_PASSWORD=rootpass
+    depends_on:
+      - db
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: curl --fail http://localhost:80 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  app-network:
+    driver: overlay
+
+volumes:
+  dbdata:
