@@ -33,7 +33,13 @@ jobs:
           docker service ls
           docker stack ps mystack
 
-      - name: Check Backend Service Health
+      - name: Check Backend Container Health (Safe Way)
         run: |
-          BACKEND_HEALTH=$(docker inspect --format='{{json .State.Health.Status}}' $(docker ps --filter name=mystack_backend --format "{{.ID}}" | head -n 1))
-          echo "Backend health status: $BACKEND_HEALTH"
+          CONTAINER_ID=$(docker ps --filter "name=mystack_backend" --format "{{.ID}}" | head -n 1)
+          if [ -z "$CONTAINER_ID" ]; then
+            echo "Backend container not found!"
+            exit 1
+          fi
+          docker inspect "$CONTAINER_ID"
+          HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' "$CONTAINER_ID" || echo "no-healthcheck")
+          echo "Backend container health status: $HEALTH_STATUS"
