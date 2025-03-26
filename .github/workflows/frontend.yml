@@ -1,49 +1,38 @@
-# ----------------------------------------------------------
-# GitHub Actions Workflow: Frontend Service CI
-# ----------------------------------------------------------
-
-# Workflow name displayed in GitHub Actions UI
 name: Frontend Service CI
 
-# ------------------- Trigger Conditions -------------------
 on:
   push:
     paths:
-      - 'frontend/**'                    # Trigger when frontend files change
-      - '.github/workflows/frontend.yml' # Trigger when this workflow file changes
+      - 'frontend/**'                   
+      - '.github/workflows/frontend.yml' 
   pull_request:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend.yml'
-  workflow_dispatch:                    # Allow manual workflow trigger
+  workflow_dispatch:                   
 
-# ------------------- Define Jobs -------------------
 jobs:
   frontend-service-ci:
-    runs-on: ubuntu-latest              # Use latest Ubuntu runner
+    runs-on: ubuntu-latest              
 
     services:
       docker:
-        image: docker:24.0.6            # Use Docker service container
+        image: docker:24.0.6          
         options: --privileged
 
     steps:
-      # ------------------- Checkout the Code -------------------
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # ------------------- Build Docker Image -------------------
       - name: Build Frontend Docker image
         run: |
           docker build -t frontend-service ./frontend
 
-      # ------------------- Run Health Check Test -------------------
       - name: Test Frontend container health
         run: |
           docker run -d --name frontend-test -p 80:80 frontend-service
           sleep 5
           curl --fail http://localhost:80
 
-      # ------------------- Cleanup -------------------
       - name: Cleanup containers
         run: docker rm -f frontend-test || true
