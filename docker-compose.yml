@@ -15,8 +15,8 @@ services:
       - DB_NAME=docker_demo
     depends_on:
       - db              # Ensure database service is started before backend
-    healthcheck:        # Health check configuration to monitor backend service health
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]  # Check if /health endpoint is working
+    healthcheck:        # Health check configuration to monitor backend service health and Check if /health endpoint is working
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]  
       interval: 30s     # Run the health check every 30 seconds
       timeout: 10s      # Timeout if health check takes more than 10 seconds
       retries: 3        # Retry health check 3 times before marking the container as unhealthy
@@ -28,18 +28,18 @@ services:
 
   # ------------------- Frontend Service -------------------
   frontend:
-    build: ./frontend   # Build the frontend image using the Dockerfile in the ./frontend directory
+    build: ./frontend  
     ports:
-      - "80:80"         # Map container's port 80 to host's port 80
+      - "80:80"        
     networks:
-      - app-network     # Connect the frontend service to the same network as backend
+      - app-network    
     depends_on:
-      - backend         # Ensure backend service starts before starting frontend (not a hard dependency on health, just order)
-    healthcheck:        # Health check configuration for the frontend service
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]   # Check if /health endpoint is working
-      interval: 30s     # Run the health check every 30 seconds
-      timeout: 10s      # Timeout if health check takes more than 10 seconds
-      retries: 3        # Retry health check 3 times before marking the container as unhealthy
+      - backend       
+    healthcheck:        
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]   
+      interval: 30s    
+      timeout: 10s    
+      retries: 3        
     logging:
       driver: "json-file"
       options:
@@ -48,16 +48,16 @@ services:
 
   # ------------------- Auth Service -------------------
   auth:
-    build: ./auth       # Build the auth image using the Dockerfile in the ./auth directory
+    build: ./auth       
     ports:
-      - "6000:6000"     # Map container's port 6000 to host's port 6000
+      - "6000:6000"     
     networks:
-      - app-network     # Connect the auth service to the same custom bridge network
-    healthcheck:        # Health check configuration for the auth service
-      test: ["CMD", "curl", "-f", "http://localhost:6000/health"]  # Check if /health endpoint is working
-      interval: 30s     # Run the health check every 30 seconds
-      timeout: 10s      # Timeout if health check takes more than 10 seconds
-      retries: 3        # Retry health check 3 times before marking the container as unhealthy
+      - app-network     
+    healthcheck:        
+      test: ["CMD", "curl", "-f", "http://localhost:6000/health"]  
+      interval: 30s    
+      timeout: 10s      
+      retries: 3        
     logging:
       driver: "json-file"
       options:
@@ -65,11 +65,11 @@ services:
         max-file: "5"
   # ------------------- MySQL Database Service -------------------
   db:
-    image: mysql:8.0    # Use official MySQL 8.0 image
+    image: mysql:8.0   
     ports:
-      - "3306:3306"     # Map MySQL port to host
+      - "3306:3306"     
     networks:
-      - app-network     # Connect DB service to the same network
+      - app-network     
     environment:
       - MYSQL_ROOT_PASSWORD=rootpass
       - MYSQL_DATABASE=docker_demo
@@ -87,11 +87,11 @@ services:
         max-size: "10m"
         max-file: "5"
   # .................... phpmyadmin service -----------------------    
-  phpmyadmin:   # The phpmyadmin service provides a graphical web interface to interact with your MySQL database inside Docker. 
-    image: phpmyadmin/phpmyadmin   # It's especially helpful for developers who prefer a GUI over writing SQL queries in the terminal
+  phpmyadmin:   
+    image: phpmyadmin/phpmyadmin   
     restart: always
     ports:
-      - "8081:80"       # phpMyAdmin uses a different host port to avoid conflict
+      - "8081:80"      
     environment:
       - PMA_HOST=db
       - PMA_PORT=3306
@@ -113,7 +113,7 @@ services:
 # ------------------- Custom Docker Network -------------------
 networks:
   app-network:
-    driver: bridge      # Use the default bridge driver for container networking
+    driver: bridge     
 
 # ------------------- Persistent Volume -------------------
 volumes:
