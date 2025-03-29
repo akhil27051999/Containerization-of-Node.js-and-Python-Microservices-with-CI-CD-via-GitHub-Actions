@@ -64,13 +64,13 @@ services:
         max-size: "10m"
         max-file: "5"
   # ------------------- MySQL Database Service -------------------
-  db:
-    image: mysql:8.0   
-    ports:
-      - "3306:3306"     
+  db:   # service name and we can define things inside the service
+    image: mysql:8.0   # it will pull the image from docker registry by default with repo name mysql and tag is 8.0
+    ports:   # it will maps the port for this service, the traffic is mapped from port 3306 directly 
+      - "3306:3306"   # if needed we can change the port for this from 3306:80. so we can check the service at http://<local_host>:3306 but the traffic is mapped internally to 80
     networks:
       - app-network     
-    environment:
+    environment:   # environment variable is used to set the application settings and secrets which are required for the system running without exposing them to the code.
       - MYSQL_ROOT_PASSWORD=rootpass
       - MYSQL_DATABASE=docker_demo
     volumes:
