@@ -17,14 +17,6 @@ This project containerizes a **microservices-based application** using **Docker,
 - Pushes Docker images to Docker Hub.
 - Deploys updates to the Swarm cluster.
   
-##🚦 Workflow Triggers
-
- -------------------------------------------------------------
-|  Trigger Type	  |    Description                           |
-|------------------------------------------------------------|
-|push	            |When new code is pushed to the repository |
-|workflow_dispatch|Manual trigger from GitHub UI             |
--------------------------------------------------------------
 ## 📌 Use Cases
 🔍 Containerize microservices for real-world deployments.
 🧪 Test services in isolation before production deployment.
