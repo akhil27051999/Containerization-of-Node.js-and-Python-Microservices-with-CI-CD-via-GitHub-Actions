@@ -16,8 +16,32 @@ This project containerizes a **microservices-based application** using **Docker,
 - GitHub Actions automates testing, building, and deployment.
 - Pushes Docker images to Docker Hub.
 - Deploys updates to the Swarm cluster.
+  
+##🚦 Workflow Triggers
+
+ -------------------------------------------------------------
+|  Trigger Type	  |    Description                           |
+|------------------------------------------------------------|
+|push	            |When new code is pushed to the repository |
+|workflow_dispatch|Manual trigger from GitHub UI             |
+-------------------------------------------------------------
+## 📌 Use Cases
+🔍 Containerize microservices for real-world deployments.
+🧪 Test services in isolation before production deployment.
+📚 Learn CI/CD workflows with GitHub Actions.
+⚙️ Automate testing & deployment using DevOps best practices.
+📊 Showcase DevOps skills in project portfolios.
 
 ## 📌 Future Improvements
 - Kubernetes deployment
 - API Gateway integration
 - Monitoring with Prometheus & Grafana
+
+## ✍️ Author
+Akhil Thyadi
+GitHub: @akhil27051999
+
+## 📜 License
+This project is open-source and available under the MIT License.
+
+
