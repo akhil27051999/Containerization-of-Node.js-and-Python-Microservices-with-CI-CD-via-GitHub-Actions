@@ -1,25 +1,25 @@
-version: '3.7'  # Specify the Docker Compose file format version
+version: '3.7' 
 
 services:
   # ------------------- Backend Service -------------------
   backend:
-    build: ./backend   # Build the backend image using the Dockerfile in the ./backend directory
+    build: ./backend  
     ports:
-      - "8080:8080"     # Map container's port 8080 to host's port 8080
+      - "8080:8080"     
     networks:
-      - app-network     # Connect the backend service to a custom bridge network named 'app-network'
+      - app-network     
     environment:
       - DB_HOST=db
       - DB_USER=root
       - DB_PASSWORD=rootpass
       - DB_NAME=docker_demo
     depends_on:
-      - db              # Ensure database service is started before backend
-    healthcheck:        # Health check configuration to monitor backend service health and Check if /health endpoint is working
+      - db             
+    healthcheck:       
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]  
-      interval: 30s     # Run the health check every 30 seconds
-      timeout: 10s      # Timeout if health check takes more than 10 seconds
-      retries: 3        # Retry health check 3 times before marking the container as unhealthy
+      interval: 30s    
+      timeout: 10s      
+      retries: 3        
     logging:
       driver: "json-file"
       options:
@@ -64,13 +64,13 @@ services:
         max-size: "10m"
         max-file: "5"
   # ------------------- MySQL Database Service -------------------
-  db:                  # service name and we can define things inside the service
-    image: mysql:8.0   # it will pull the image from docker registry by default with repo name mysql and tag is 8.0
-    ports:             # it will maps the port for this service, the traffic is mapped from port 3306 directly 
-      - "3306:3306"    # if needed we can change the port for this from 3306:80. so we can check the service at http://<local_host>:3306 but the traffic is mapped internally to 80
+  db:                 
+    image: mysql:8.0   
+    ports:            
+      - "3306:3306"   
     networks:
       - app-network     
-    environment:       # environment variable is used to set the application settings and secrets which are required for the system running without exposing them to the code.
+    environment:      
       - MYSQL_ROOT_PASSWORD=rootpass
       - MYSQL_DATABASE=docker_demo
     volumes:
