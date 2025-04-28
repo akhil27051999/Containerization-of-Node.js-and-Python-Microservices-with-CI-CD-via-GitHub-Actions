@@ -32,7 +32,5 @@ This project containerizes a **microservices-based application** using **Docker,
 - Akhil Thyadi
 - GitHub: @akhil27051999
 
-## 📜 License
-This project is open-source and available under the MIT License.
 
 
