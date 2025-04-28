@@ -22,7 +22,6 @@ This project containerizes a **microservices-based application** using **Docker,
 - 🧪 Test services in isolation before production deployment.
 - 📚 CI/CD workflows with GitHub Actions.
 - ⚙️ Automate testing & deployment using DevOps best practices.
-- 📊 Showcase DevOps skills in project portfolios.
 
 ## 📌 Future Improvements
 - Kubernetes deployment
@@ -30,8 +29,8 @@ This project containerizes a **microservices-based application** using **Docker,
 - Monitoring with Prometheus & Grafana
 
 ## ✍️ Author
-Akhil Thyadi
-GitHub: @akhil27051999
+- Akhil Thyadi
+- GitHub: @akhil27051999
 
 ## 📜 License
 This project is open-source and available under the MIT License.
