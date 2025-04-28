@@ -23,7 +23,7 @@ This project containerizes a **microservices-based application** using **Docker,
 - 📚 CI/CD workflows with GitHub Actions.
 - ⚙️ Automate testing & deployment using DevOps best practices.
 
-## 📌 Future Improvements
+## 🔮 Future Improvements
 - Kubernetes deployment
 - API Gateway integration
 - Monitoring with Prometheus & Grafana
