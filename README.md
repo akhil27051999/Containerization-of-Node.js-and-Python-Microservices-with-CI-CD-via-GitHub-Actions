@@ -20,7 +20,7 @@ This project containerizes a **microservices-based application** using **Docker,
 ## 📌 Use Cases
 - 🔍 Containerize microservices for real-world deployments.
 - 🧪 Test services in isolation before production deployment.
-- 📚 Learn CI/CD workflows with GitHub Actions.
+- 📚 CI/CD workflows with GitHub Actions.
 - ⚙️ Automate testing & deployment using DevOps best practices.
 - 📊 Showcase DevOps skills in project portfolios.
 
