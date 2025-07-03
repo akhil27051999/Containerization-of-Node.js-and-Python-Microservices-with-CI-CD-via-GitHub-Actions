@@ -1,7 +1,7 @@
 # 🚀 Microservices Containerization with Github Actions CICD
 
 ## 📝 Overview  
-This project containerizes a **microservices-based application** locally using **Docker, Docker Compose, and Docker Swarm**, with **CI/CD automation via GitHub Actions**.  
+This project containerizes a **microservices-based application** locally using **Docker Compose**, and in production using **Docker Swarm**, with **CI/CD automation via GitHub Actions**.  
 
 ## ✅ Section 1: Docker Concepts, Commands & Use Cases
 
