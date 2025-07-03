@@ -3,7 +3,7 @@
 ## 📝 Overview  
 This project containerizes a **microservices-based application** using **Docker, Docker Compose, and Docker Swarm**, with **CI/CD automation via GitHub Actions**.  
 
-# ✅ Section 1: Project Overview – Microservices Containerization with CI/CD
+## ✅ Section 1: Project Overview – Microservices Containerization with CI/CD
 
 ### 📘 Concept: Containerized Microservices with GitHub CI/CD
 
@@ -18,7 +18,7 @@ This project demonstrates a complete DevOps pipeline for a microservices archite
 
 ---
 
-# ✅ Section 2: Docker Concepts, Commands & Use Cases
+## ✅ Section 2: Docker Concepts, Commands & Use Cases
 
 ### 📘 Core Docker Concepts
 
@@ -93,7 +93,7 @@ docker network create mynet               # Create a user-defined network
 
 ---
 
-# ✅ Section 3: Dockerizing Each Microservice
+## ✅ Section 3: Dockerizing Each Microservice
 
 ### 🛠️ Sample Dockerfile (Node.js Backend)
 
@@ -127,7 +127,7 @@ docker build -t auth ./auth
 
 ---
 
-# ✅ Section 4: Defining Multi-Container Setup with Docker Compose
+## ✅ Section 4: Defining Multi-Container Setup with Docker Compose
 
 ### 📘 Concept: Local Orchestration
 
@@ -172,7 +172,7 @@ docker-compose logs -f
 
 ---
 
-# ✅ Section 5: Docker Swarm for Production-Like Orchestration
+## ✅ Section 5: Docker Swarm for Production-Like Orchestration
 
 ### 📘 Concept: Swarm Mode
 
@@ -194,7 +194,7 @@ docker stack ps mystack
 
 ---
 
-# ✅ Section 6: GitHub Actions CI/CD Pipeline
+## ✅ Section 6: GitHub Actions CI/CD Pipeline
 
 ### 📘 Concept: Automation with GitHub Actions
 
@@ -236,7 +236,7 @@ jobs:
 
 ---
 
-# ✅ Section 7: Environment Variables & Secrets
+## ✅ Section 7: Environment Variables & Secrets
 
 ### 📘 Concept: Secure Configuration
 
@@ -252,7 +252,7 @@ Sensitive data like DB passwords or Docker Hub credentials should not be hardcod
 
 ---
 
-# ✅ Section 8: Verification & Troubleshooting
+## ✅ Section 8: Verification & Troubleshooting
 
 ### ✅ Verification
 
