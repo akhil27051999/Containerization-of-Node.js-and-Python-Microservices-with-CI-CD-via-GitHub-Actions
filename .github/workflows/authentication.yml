@@ -1,24 +1,16 @@
-# ----------------------------------------------------------
-# GitHub Actions Workflow: Auth Service CI
-# ----------------------------------------------------------
-
-# Workflow name displayed in GitHub Actions UI
-
 name: Auth Service CI
 
-# ------------------- Trigger Conditions -------------------
 on:
   push:
     paths:
       - 'auth/**'
-      - '.github/workflows/auth.yml'
+      - '.github/workflows/authentication.yml'
   pull_request:
     paths:
       - 'auth/**'
-      - '.github/workflows/auth.yml'
+      - '.github/workflows/authentication.yml'
   workflow_dispatch:
 
-# ------------------- Define Jobs ------------------- 
 jobs:
   auth-service-ci:
     runs-on: ubuntu-latest
@@ -29,35 +21,29 @@ jobs:
         options: --privileged
 
     steps:
-      # ------------------- Checkout the Code -------------------
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # ------------------- Set up Python -------------------
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
 
-      # ------------------- Install Dependencies -------------------
       - name: Install Python dependencies
         run: |
           cd auth/app
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # ------------------- Build Docker Image -------------------
       - name: Build Auth Docker image
         run: |
           docker build -t auth-service ./auth
 
-      # ------------------- Run Health Check Test -------------------
       - name: Test Auth container health
         run: |
           docker run -d --name auth-test -p 6000:6000 auth-service
           sleep 5
           curl --fail http://localhost:6000/health
 
-      # ------------------- Cleanup -------------------
       - name: Cleanup containers
         run: docker rm -f auth-test || true
