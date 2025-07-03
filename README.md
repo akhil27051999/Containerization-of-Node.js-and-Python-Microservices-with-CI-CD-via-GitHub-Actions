@@ -66,7 +66,6 @@ docker network create mynet               # Create a user-defined network
 | Docker Hub   | Share and pull prebuilt images across environments   |
 | Swarm        | Simulate production deployment locally with replicas |
 
----
 
 ## ✅ Section 2: Project Overview – Microservices 
 
@@ -77,7 +76,6 @@ docker network create mynet               # Create a user-defined network
 * **Auth Service**: Python (FastAPI or Django) – Authentication
 * **Database**: PostgreSQL or MySQL
 
----
 ## ✅ Section 3: Dockerizing Each Microservice
 
 ### 🛠️ Sample Dockerfile (Node.js Backend Service)
@@ -105,8 +103,6 @@ CMD ["node", "index.js"]
 ```bash
 docker build -t backend ./backend
 ```
-
----
 
 ## ✅ Section 4: Defining Multi-Container Setup with Docker Compose
 
@@ -159,8 +155,6 @@ docker-compose ps
 docker-compose logs -f
 ```
 
----
-
 ## ✅ Section 5: Docker Swarm for Production-Like Orchestration
 
 ### 📘 Concept: Swarm Mode
@@ -180,8 +174,6 @@ docker stack deploy -c docker-compose.yml mystack
 docker stack services mystack
 docker stack ps mystack
 ```
-
----
 
 ## ✅ Section 6: GitHub Actions CI/CD Pipeline
 
@@ -282,7 +274,6 @@ jobs:
           docker-compose down
 ```
 
----
 
 ## ✅ Section 7: Environment Variables & Secrets
 
@@ -298,7 +289,6 @@ Sensitive data like DB passwords or Docker Hub credentials should not be hardcod
   * `DOCKER_USERNAME`
   * `DOCKER_PASSWORD`
 
----
 
 ## ✅ Section 8: Verification & Troubleshooting
 
@@ -321,7 +311,6 @@ curl http://localhost:8000
 | GitHub Action fails          | Wrong Docker credentials        | Recheck repository secrets            |
 | Container crashing on start  | Wrong CMD or missing dependency | Check logs and Dockerfile             |
 
----
 
 # 📃 Final Commands Summary 
 
