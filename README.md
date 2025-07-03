@@ -90,34 +90,30 @@ docker network create mynet               # Create a user-defined network
 ---
 ## ✅ Section 3: Dockerizing Each Microservice
 
-### 🛠️ Sample Dockerfile (Node.js Backend)
+### 🛠️ Sample Dockerfile (Node.js Backend Service)
 
 ```Dockerfile
-FROM node:18-alpine
+
+FROM node:18 as builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-CMD ["npm", "start"]
-```
 
-### 🛠️ Sample Dockerfile (Python Auth Service)
-
-```Dockerfile
-FROM python:3.9-slim
+FROM node:18-slim
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+COPY package*.json ./
+RUN npm install --omit=dev
+COPY --from=builder /app .
+ENV PORT=8080
+EXPOSE 8080
+CMD ["node", "index.js"]
 ```
 
 ### ✅ Commands
 
 ```bash
-docker build -t frontend ./frontend
 docker build -t backend ./backend
-docker build -t auth ./auth
 ```
 
 ---
@@ -128,33 +124,41 @@ docker build -t auth ./auth
 
 Use Docker Compose for local development and to define the full stack.
 
-### 🛠️ docker-compose.yml
+### 🛠️ Sample docker-compose.yml of one service
 
 ```yaml
-version: '3.8'
+version: '3.7' 
+
 services:
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
   backend:
-    build: ./backend
+    build: ./backend  
     ports:
-      - "5000:5000"
-  auth:
-    build: ./auth
-    ports:
-      - "8000:8000"
-  db:
-    image: postgres:15
+      - "8080:8080"     
+    networks:
+      - app-network     
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: appdb
-    volumes:
-      - db-data:/var/lib/postgresql/data
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=rootpass
+      - DB_NAME=docker_demo
+    depends_on:
+      - db             
+    healthcheck:       
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]  
+      interval: 30s    
+      timeout: 10s      
+      retries: 3        
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+networks:
+  app-network:
+    driver: bridge     
+
 volumes:
-  db-data:
+  dbdata:
 ```
 
 ### ✅ Commands
@@ -195,38 +199,97 @@ docker stack ps mystack
 
 Automates build, test, and deployment when code is pushed.
 
-### 🛠️ .github/workflows/cicd.yml
+### 🛠️ .github/workflows/backend.yml
 
 ```yaml
-name: CI/CD Pipeline
+ 
+name: Backend Service CI
+
 on:
   push:
-    branches: [main]
+    paths:
+      - 'backend/**'                    
+      - '.github/workflows/backend.yml' 
+  pull_request:
+    paths:
+      - 'backend/**'                    
+      - '.github/workflows/backend.yml' 
+  workflow_dispatch:                    
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+  backend:
+    runs-on: ubuntu-latest             
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Check out code
+        uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and Push Images
+      - name: Set up Docker
         run: |
-          docker build -t user/frontend:latest ./frontend
-          docker build -t user/backend:latest ./backend
-          docker build -t user/auth:latest ./auth
-          docker push user/frontend:latest
-          docker push user/backend:latest
-          docker push user/auth:latest
+          # Uninstall conflicting containerd packages
+          sudo apt-get remove -y containerd containerd.io
+          
+          # Update package list
+          sudo apt-get update
+
+          # Install Docker dependencies
+          sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+
+          # Add Docker's official GPG key
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+          # Set up the stable Docker repository
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+          # Install Docker Engine and Docker Compose
+          sudo apt-get update
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+          
+          # Install Docker Compose
+          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          
+          # Verify installation
+          docker --version
+          docker-compose --version
+
+      - name: Build and start backend service with Docker Compose
+        run: |
+          docker-compose -f docker-compose.yml up -d --build backend
+
+      - name: Wait for backend to be ready
+        run: |
+          echo "Waiting for backend service to be ready..."
+          sleep 30  # Adjust the sleep time based on expected startup time
+
+      - name: Check backend service health
+        run: |
+          echo "Testing backend service at http://localhost:8080"
+          curl -f http://localhost:8080/health || echo "Backend service failed health check!"
+
+      - name: Get backend service logs
+        run: |
+          echo "Fetching backend service logs"
+          docker-compose logs backend
+
+      - name: Get MySQL DB logs
+        run: |
+          echo "Fetching MySQL DB logs"
+          docker-compose logs db
+
+      - name: Check if MySQL service is accessible
+        run: |
+          echo "Checking if MySQL DB is accessible"
+          docker-compose exec db mysqladmin ping -h localhost || echo "MySQL DB is not accessible!"
+
+      - name: Run backend tests
+        run: |
+          echo "Running backend tests inside backend container"
+          docker-compose exec -T backend npm test  # Ensure tests run inside the backend container
+
+      - name: Shut down the Docker containers
+        run: |
+          docker-compose down
 ```
 
 ---
