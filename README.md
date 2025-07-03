@@ -66,16 +66,6 @@ docker network create mynet               # Create a user-defined network
 | Docker Hub   | Share and pull prebuilt images across environments   |
 | Swarm        | Simulate production deployment locally with replicas |
 
-### 🔧 Troubleshooting
-
-| Problem                     | Solution                               |
-| --------------------------- | -------------------------------------- |
-| Container exits immediately | Check CMD or entrypoint                |
-| Port already in use         | Change host port mapping               |
-| Build fails                 | Validate Dockerfile & context          |
-| Volume issues               | Inspect paths and Docker volume config |
-| Image pull failed           | Check Docker login and repo settings   |
-
 ---
 
 ## ✅ Section 2: Project Overview – Microservices 
