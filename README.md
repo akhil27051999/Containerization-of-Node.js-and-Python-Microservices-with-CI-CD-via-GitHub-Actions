@@ -5,10 +5,6 @@ This project containerizes a **microservices-based application** using **Docker,
 
 ## ✅ Section 1: Project Overview – Microservices Containerization with CI/CD
 
-### 📘 Concept: Containerized Microservices with GitHub CI/CD
-
-This project demonstrates a complete DevOps pipeline for a microservices architecture using Docker, Docker Compose, Docker Swarm, and GitHub Actions.
-
 ### 📦 Microservices:
 
 * **Frontend**: Node.js – UI Service
