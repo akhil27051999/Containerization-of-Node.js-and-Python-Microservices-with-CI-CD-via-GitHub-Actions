@@ -3,7 +3,7 @@
 ## 📝 Overview  
 This project containerizes a **microservices-based application** using **Docker, Docker Compose, and Docker Swarm**, with **CI/CD automation via GitHub Actions**.  
 
-## ✅ Section 1: Project Overview – Microservices Containerization with CI/CD
+## ✅ Section 1: Project Overview – Microservices 
 
 ### 📦 Microservices:
 
