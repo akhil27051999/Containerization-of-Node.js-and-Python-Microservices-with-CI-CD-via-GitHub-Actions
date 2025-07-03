@@ -3,18 +3,7 @@
 ## 📝 Overview  
 This project containerizes a **microservices-based application** using **Docker, Docker Compose, and Docker Swarm**, with **CI/CD automation via GitHub Actions**.  
 
-## ✅ Section 1: Project Overview – Microservices 
-
-### 📦 Microservices:
-
-* **Frontend**: Node.js – UI Service
-* **Backend**: Node.js – API Service
-* **Auth Service**: Python (FastAPI or Django) – Authentication
-* **Database**: PostgreSQL or MySQL
-
----
-
-## ✅ Section 2: Docker Concepts, Commands & Use Cases
+## ✅ Section 1: Docker Concepts, Commands & Use Cases
 
 ### 📘 Core Docker Concepts
 
@@ -89,6 +78,16 @@ docker network create mynet               # Create a user-defined network
 
 ---
 
+## ✅ Section 2: Project Overview – Microservices 
+
+### 📦 Microservices:
+
+* **Frontend**: Node.js – UI Service
+* **Backend**: Node.js – API Service
+* **Auth Service**: Python (FastAPI or Django) – Authentication
+* **Database**: PostgreSQL or MySQL
+
+---
 ## ✅ Section 3: Dockerizing Each Microservice
 
 ### 🛠️ Sample Dockerfile (Node.js Backend)
