@@ -275,7 +275,7 @@ curl http://localhost:8000
 
 ---
 
-# 📃 Final Commands Summary (Chronological)
+# 📃 Final Commands Summary 
 
 ```bash
 # Docker Builds
